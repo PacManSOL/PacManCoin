@@ -16,13 +16,14 @@ header {
 }
 
 #logo {
-    width: 50px;
-    height: 50px;
-    margin-right: 20px;
+    width: 75px; /* 1.5 razy większe */
+    height: 75px; /* 1.5 razy większe */
+    margin-right: 30px; /* 1.5 razy większe */
 }
 
 h1 {
     font-family: 'Impact', sans-serif;
+    font-size: 54px; /* 1.5 razy większe */
 }
 
 #container {
@@ -35,12 +36,12 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100px;
+    width: 150px; /* 1.5 razy większe */
 }
 
 .social-icon {
-    width: 50px;
-    height: 50px;
+    width: 75px; /* 1.5 razy większe */
+    height: 75px; /* 1.5 razy większe */
 }
 
 #game-area {
@@ -51,5 +52,5 @@ h1 {
 }
 
 canvas {
-    border: 2px solid #fff;
+    border: 3px solid #fff; /* 1.5 razy większe */
 }
