@@ -136,35 +136,34 @@ function moveGhosts() {
                 }
             }
         }
-    });
-}
 
-function update() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawMaze();
-    movePacman();
-    moveGhosts();
-    drawPacman();
-    drawGhosts();
-
-    ghosts.forEach(ghost => {
-        if (checkCollision(pacman, ghost)) {
-            lives -= 1;
-            document.getElementById('lives').removeChild(document.getElementById('lives').lastChild);
+        if (checkCollision(ghost, pacman)) {
+            lives--;
+            document.getElementById('lives').innerHTML = '';
+            for (let i = 0; i < lives; i++) {
+                const heart = document.createElement('img');
+                heart.src = 'images/heart.png';
+                heart.style.width = '20px';
+                heart.style.height = '20px';
+                document.getElementById('lives').appendChild(heart);
+            }
             if (lives === 0) {
-                ctx.drawImage(images.gameOver, 150, 150, 300, 300);
+                ctx.drawImage(images.gameOver, 0, 0, canvas.width, canvas.height);
                 return;
             }
             pacman.x = tileSize + 10;
             pacman.y = tileSize + 10;
         }
     });
+}
 
-    if (score === 160) { // adjust this value to the total number of coins
-        ctx.drawImage(images.win, 150, 150, 300, 300);
-        return;
-    }
-
+function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawMaze();
+    drawPacman();
+    drawGhosts();
+    movePacman();
+    moveGhosts();
     requestAnimationFrame(update);
 }
 
