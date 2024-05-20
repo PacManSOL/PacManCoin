@@ -1,6 +1,6 @@
 const canvas = document.getElementById('gameCanvas');
-canvas.width = 600;  // 1.5 razy większe (400 * 1.5)
-canvas.height = 600; // 1.5 razy większe (400 * 1.5)
+canvas.width = 600; 
+canvas.height = 600;
 const ctx = canvas.getContext('2d');
 
 const images = {
@@ -19,11 +19,11 @@ let score = 0;
 let lives = 3;
 
 const pacman = {
-    x: 60,  // 1.5 razy większe (40 * 1.5)
-    y: 60,  // 1.5 razy większe (40 * 1.5)
-    size: 30,  // 1.5 razy większe (20 * 1.5)
-    speed: 3,  // 1.5 razy większe (2 * 1.5)
-    dx: 3,  // 1.5 razy większe (2 * 1.5)
+    x: 60,
+    y: 60,
+    size: 30,
+    speed: 3,
+    dx: 3,
     dy: 0
 };
 
@@ -35,19 +35,19 @@ const ghosts = [
 ];
 
 const walls = [
-    { x: 90, y: 90, width: 420, height: 30 }, // Zmienione na 1.5 razy większe
+    { x: 90, y: 90, width: 420, height: 30 },
     { x: 90, y: 90, width: 30, height: 420 },
     { x: 90, y: 480, width: 420, height: 30 },
     { x: 480, y: 90, width: 30, height: 420 }
 ];
 
 const coins = [
-    { x: 150, y: 150, size: 15, image: images.coin }, // Zmienione na 1.5 razy większe
-    { x: 300, y: 150, size: 15, image: images.coin },
-    { x: 450, y: 150, size: 15, image: images.coin },
-    { x: 150, y: 300, size: 15, image: images.coin },
-    { x: 300, y: 300, size: 15, image: images.coin },
-    { x: 450, y: 300, size: 15, image: images.coin }
+    { x: 150, y: 150, size: 15, image: images.coin, collected: false },
+    { x: 300, y: 150, size: 15, image: images.coin, collected: false },
+    { x: 450, y: 150, size: 15, image: images.coin, collected: false },
+    { x: 150, y: 300, size: 15, image: images.coin, collected: false },
+    { x: 300, y: 300, size: 15, image: images.coin, collected: false },
+    { x: 450, y: 300, size: 15, image: images.coin, collected: false }
 ];
 
 document.addEventListener('keydown', changeDirection);
@@ -85,7 +85,7 @@ function drawWalls() {
 }
 
 function drawCoins() {
-    coins.forEach((coin, index) => {
+    coins.forEach(coin => {
         if (!coin.collected) {
             const img = new Image();
             img.src = coin.image;
@@ -108,6 +108,13 @@ function drawGhosts() {
     });
 }
 
+function checkCollision(obj1, obj2) {
+    return obj1.x < obj2.x + obj2.size &&
+           obj1.x + obj1.size > obj2.x &&
+           obj1.y < obj2.y + obj2.size &&
+           obj1.y + obj1.size > obj2.y;
+}
+
 function movePacman() {
     pacman.x += pacman.dx;
     pacman.y += pacman.dy;
@@ -118,20 +125,22 @@ function movePacman() {
         pacman.y -= pacman.dy;
     }
 
+    walls.forEach(wall => {
+        if (checkCollision(pacman, wall)) {
+            pacman.x -= pacman.dx;
+            pacman.y -= pacman.dy;
+        }
+    });
+
     coins.forEach((coin, index) => {
-        if (!coin.collected && pacman.x < coin.x + coin.size &&
-            pacman.x + pacman.size > coin.x &&
-            pacman.y < coin.y + coin.size &&
-            pacman.y + pacman.size > coin.y) {
+        if (!coin.collected && checkCollision(pacman, coin)) {
             coin.collected = true;
             score++;
             document.getElementById('score').textContent = "SCORE: " + score;
-            // Play coin collection sound
         }
     });
 
     if (coins.every(coin => coin.collected)) {
-        // Show win screen
         const winImg = new Image();
         winImg.src = images.win;
         winImg.onload = () => {
@@ -155,17 +164,10 @@ function moveGhosts() {
             ghost.dy *= -1;
         }
 
-        if (pacman.x < ghost.x + ghost.size &&
-            pacman.x + pacman.size > ghost.x &&
-            pacman.y < ghost.y + ghost.size &&
-            pacman.y + pacman.size > ghost.y) {
-            // Collision with ghost
+        if (checkCollision(pacman, ghost)) {
             lives--;
             document.getElementById('lives').removeChild(document.querySelector('.life'));
-            // Play game over sound
-
             if (lives === 0) {
-                // Show game over screen
                 const gameOverImg = new Image();
                 gameOverImg.src = images.gameOver;
                 gameOverImg.onload = () => {
