@@ -17,9 +17,9 @@ images.heart.src = 'images/heart.png';
 images.win.src = 'images/win.png';
 images.gameOver.src = 'images/gameOver.png';
 
-const tileSize = 50;
-const numRows = 12;
-const numCols = 12;
+const tileSize = 40;
+const numRows = 15;
+const numCols = 15;
 
 const maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
