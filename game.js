@@ -103,6 +103,13 @@ function movePacman() {
 
 function moveGhosts() {
     ghosts.forEach(ghost => {
+        const distX = pacman.x - ghost.x;
+        const distY = pacman.y - ghost.y;
+        const angle = Math.atan2(distY, distX);
+
+        ghost.dx = Math.cos(angle) * ghost.speed;
+        ghost.dy = Math.sin(angle) * ghost.speed;
+
         ghost.x += ghost.dx;
         ghost.y += ghost.dy;
 
@@ -111,19 +118,12 @@ function moveGhosts() {
                 if (maze[row][col] === 1) {
                     const wall = { x: col * 30, y: row * 30, width: 30, height: 30 };
                     if (checkCollision(ghost, wall)) {
-                        ghost.dx *= -1;
-                        ghost.dy *= -1;
+                        ghost.x -= ghost.dx;
+                        ghost.y -= ghost.dy;
                     }
                 }
             }
         }
-
-        const distX = pacman.x - ghost.x;
-        const distY = pacman.y - ghost.y;
-        const angle = Math.atan2(distY, distX);
-
-        ghost.dx = Math.cos(angle) * ghost.speed;
-        ghost.dy = Math.sin(angle) * ghost.speed;
     });
 }
 
