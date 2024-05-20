@@ -5,7 +5,6 @@ const images = {
     pacman: new Image(),
     ghost: new Image(),
     coin: new Image(),
-    heart: new Image(),
     win: new Image(),
     gameOver: new Image()
 };
@@ -13,98 +12,87 @@ const images = {
 images.pacman.src = 'images/pacman.png';
 images.ghost.src = 'images/ghost.png';
 images.coin.src = 'images/coin.png';
-images.heart.src = 'images/heart.png';
 images.win.src = 'images/win.png';
 images.gameOver.src = 'images/gameOver.png';
 
-const tileSize = 40;
-const numRows = 15;
-const numCols = 15;
-
-const maze = [
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1],
-    [1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1],
-    [1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1],
-    [1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
-    [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-];
-
 const pacman = {
-    x: tileSize + 10,
-    y: tileSize + 10,
-    width: 20,
-    height: 20,
+    x: 50,
+    y: 50,
+    size: 20,
     speed: 2,
     dx: 0,
     dy: 0
 };
 
 const ghosts = [
-    { x: 2 * tileSize + 10, y: 2 * tileSize + 10, width: 20, height: 20, speed: 1.5, dx: 0, dy: 0 },
-    { x: 10 * tileSize + 10, y: 2 * tileSize + 10, width: 20, height: 20, speed: 1.5, dx: 0, dy: 0 }
+    { x: 100, y: 100, size: 20, speed: 1.5, dx: 1.5, dy: 0 },
+    { x: 200, y: 200, size: 20, speed: 1.5, dx: 1.5, dy: 0 }
+];
+
+const maze = [
+    // 0: empty space, 1: wall, 2: coin
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 2, 0, 0, 1, 0, 0, 0, 1, 2, 1, 0, 0, 0, 1, 2, 0, 0, 2, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+    [1, 0, 1, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 1, 2, 0, 1],
+    [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
+    [1, 0, 0, 0, 1, 2, 1, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+    [1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+    [1, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 1, 0, 1, 2, 0, 0, 0, 1],
+    [1, 2, 1, 1, 1, 0, 1, 0, 1, 2, 1, 1, 1, 0, 1, 1, 1, 1, 2, 1],
+    [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
 let score = 0;
 let lives = 3;
 
 function drawMaze() {
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 5;
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-    for (let row = 0; row < numRows; row++) {
-        for (let col = 0; col < numCols; col++) {
+    for (let row = 0; row < maze.length; row++) {
+        for (let col = 0; col < maze[row].length; col++) {
             if (maze[row][col] === 1) {
                 ctx.fillStyle = 'blue';
-                ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
-            } else if (maze[row][col] === 0) {
-                ctx.drawImage(images.coin, col * tileSize + 15, row * tileSize + 15, 10, 10);
+                ctx.fillRect(col * 30, row * 30, 30, 30);
+            } else if (maze[row][col] === 2) {
+                ctx.drawImage(images.coin, col * 30 + 10, row * 30 + 10, 10, 10);
             }
         }
     }
 }
 
 function drawPacman() {
-    ctx.drawImage(images.pacman, pacman.x, pacman.y, pacman.width, pacman.height);
+    ctx.drawImage(images.pacman, pacman.x - pacman.size, pacman.y - pacman.size, pacman.size * 2, pacman.size * 2);
 }
 
 function drawGhosts() {
     ghosts.forEach(ghost => {
-        ctx.drawImage(images.ghost, ghost.x, ghost.y, ghost.width, ghost.height);
+        ctx.drawImage(images.ghost, ghost.x - ghost.size, ghost.y - ghost.size, ghost.size * 2, ghost.size * 2);
     });
 }
 
 function checkCollision(obj1, obj2) {
     return obj1.x < obj2.x + obj2.width &&
-           obj1.x + obj1.width > obj2.x &&
+           obj1.x + obj1.size > obj2.x &&
            obj1.y < obj2.y + obj2.height &&
-           obj1.y + obj1.height > obj2.y;
+           obj1.y + obj1.size > obj2.y;
 }
 
 function movePacman() {
     pacman.x += pacman.dx;
     pacman.y += pacman.dy;
 
-    for (let row = 0; row < numRows; row++) {
-        for (let col = 0; col < numCols; col++) {
+    for (let row = 0; row < maze.length; row++) {
+        for (let col = 0; col < maze[row].length; col++) {
             if (maze[row][col] === 1) {
-                const wall = { x: col * tileSize, y: row * tileSize, width: tileSize, height: tileSize };
+                const wall = { x: col * 30, y: row * 30, width: 30, height: 30 };
                 if (checkCollision(pacman, wall)) {
                     pacman.x -= pacman.dx;
                     pacman.y -= pacman.dy;
                 }
-            } else if (maze[row][col] === 0) {
-                const coin = { x: col * tileSize + 15, y: row * tileSize + 15, width: 10, height: 10 };
+            } else if (maze[row][col] === 2) {
+                const coin = { x: col * 30 + 10, y: row * 30 + 10, width: 10, height: 10 };
                 if (checkCollision(pacman, coin)) {
-                    maze[row][col] = 2;
+                    maze[row][col] = 0;
                     score += 10;
                     document.getElementById('score').innerText = `SCORE: ${score}`;
                 }
@@ -125,10 +113,10 @@ function moveGhosts() {
         ghost.x += ghost.dx;
         ghost.y += ghost.dy;
 
-        for (let row = 0; row < numRows; row++) {
-            for (let col = 0; col < numCols; col++) {
+        for (let row = 0; row < maze.length; row++) {
+            for (let col = 0; col < maze[row].length; col++) {
                 if (maze[row][col] === 1) {
-                    const wall = { x: col * tileSize, y: row * tileSize, width: tileSize, height: tileSize };
+                    const wall = { x: col * 30, y: row * 30, width: 30, height: 30 };
                     if (checkCollision(ghost, wall)) {
                         ghost.x -= ghost.dx;
                         ghost.y -= ghost.dy;
@@ -136,34 +124,35 @@ function moveGhosts() {
                 }
             }
         }
-
-        if (checkCollision(ghost, pacman)) {
-            lives--;
-            document.getElementById('lives').innerHTML = '';
-            for (let i = 0; i < lives; i++) {
-                const heart = document.createElement('img');
-                heart.src = 'images/heart.png';
-                heart.style.width = '20px';
-                heart.style.height = '20px';
-                document.getElementById('lives').appendChild(heart);
-            }
-            if (lives === 0) {
-                ctx.drawImage(images.gameOver, 0, 0, canvas.width, canvas.height);
-                return;
-            }
-            pacman.x = tileSize + 10;
-            pacman.y = tileSize + 10;
-        }
     });
 }
 
 function update() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawMaze();
-    drawPacman();
-    drawGhosts();
     movePacman();
     moveGhosts();
+    drawPacman();
+    drawGhosts();
+
+    ghosts.forEach(ghost => {
+        if (checkCollision(pacman, ghost)) {
+            lives -= 1;
+            document.getElementById('lives').removeChild(document.getElementById('lives').lastChild);
+            if (lives === 0) {
+                ctx.drawImage(images.gameOver, 150, 150, 300, 300);
+                return;
+            }
+            pacman.x = 50;
+            pacman.y = 50;
+        }
+    });
+
+    if (score === 160) { // adjust this value to the total number of coins
+        ctx.drawImage(images.win, 150, 150, 300, 300);
+        return;
+    }
+
     requestAnimationFrame(update);
 }
 
@@ -193,34 +182,12 @@ document.addEventListener('keydown', e => {
 });
 
 document.addEventListener('keyup', e => {
-    switch (e.key) {
-        case 'ArrowUp':
-        case 'ArrowDown':
-        case 'ArrowLeft':
-        case 'ArrowRight':
-        case 'w':
-        case 'a':
-        case 's':
-        case 'd':
-            pacman.dx = 0;
-            pacman.dy = 0;
-            break;
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd'].includes(e.key)) {
+        pacman.dx = 0;
+        pacman.dy = 0;
     }
 });
 
-function init() {
-    const livesContainer = document.getElementById('lives');
-    livesContainer.innerHTML = '';
-    for (let i = 0; i < lives; i++) {
-        const heart = document.createElement('img');
-        heart.src = 'images/heart.png';
-        heart.style.width = '20px';
-        heart.style.height = '20px';
-        livesContainer.appendChild(heart);
-    }
-
-    document.getElementById('score').innerText = 'SCORE: 0';
+images.pacman.onload = () => {
     update();
-}
-
-init();
+};
