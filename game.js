@@ -1,4 +1,6 @@
 const canvas = document.getElementById('gameCanvas');
+canvas.width = 600;  // 1.5 razy większe (400 * 1.5)
+canvas.height = 600; // 1.5 razy większe (400 * 1.5)
 const ctx = canvas.getContext('2d');
 
 const images = {
@@ -11,35 +13,35 @@ const images = {
 };
 
 const pacman = {
-    x: 40,
-    y: 40,
-    size: 20,
-    speed: 2,
-    dx: 2,
+    x: 60,  // 1.5 razy większe (40 * 1.5)
+    y: 60,  // 1.5 razy większe (40 * 1.5)
+    size: 30,  // 1.5 razy większe (20 * 1.5)
+    speed: 3,  // 1.5 razy większe (2 * 1.5)
+    dx: 3,  // 1.5 razy większe (2 * 1.5)
     dy: 0
 };
 
 const ghosts = [
-    { x: 80, y: 80, size: 20, speed: 2, dx: 2, dy: 0, image: images.ghost1 },
-    { x: 320, y: 80, size: 20, speed: 2, dx: -2, dy: 0, image: images.ghost2 },
-    { x: 80, y: 320, size: 20, speed: 2, dx: 2, dy: 0, image: images.ghost3 },
-    { x: 320, y: 320, size: 20, speed: 2, dx: -2, dy: 0, image: images.ghost4 }
+    { x: 120, y: 120, size: 30, speed: 3, dx: 3, dy: 0, image: images.ghost1 },
+    { x: 480, y: 120, size: 30, speed: 3, dx: -3, dy: 0, image: images.ghost2 },
+    { x: 120, y: 480, size: 30, speed: 3, dx: 3, dy: 0, image: images.ghost3 },
+    { x: 480, y: 480, size: 30, speed: 3, dx: -3, dy: 0, image: images.ghost4 }
 ];
 
 const walls = [
-    { x: 60, y: 60, width: 280, height: 20 },
-    { x: 60, y: 60, width: 20, height: 280 },
-    { x: 60, y: 320, width: 280, height: 20 },
-    { x: 320, y: 60, width: 20, height: 280 }
+    { x: 90, y: 90, width: 420, height: 30 }, // Zmienione na 1.5 razy większe
+    { x: 90, y: 90, width: 30, height: 420 },
+    { x: 90, y: 480, width: 420, height: 30 },
+    { x: 480, y: 90, width: 30, height: 420 }
 ];
 
 const coins = [
-    { x: 100, y: 100, size: 10, image: images.coin },
-    { x: 200, y: 100, size: 10, image: images.coin },
-    { x: 300, y: 100, size: 10, image: images.coin },
-    { x: 100, y: 200, size: 10, image: images.coin },
-    { x: 200, y: 200, size: 10, image: images.coin },
-    { x: 300, y: 200, size: 10, image: images.coin }
+    { x: 150, y: 150, size: 15, image: images.coin }, // Zmienione na 1.5 razy większe
+    { x: 300, y: 150, size: 15, image: images.coin },
+    { x: 450, y: 150, size: 15, image: images.coin },
+    { x: 150, y: 300, size: 15, image: images.coin },
+    { x: 300, y: 300, size: 15, image: images.coin },
+    { x: 450, y: 300, size: 15, image: images.coin }
 ];
 
 document.addEventListener('keydown', changeDirection);
