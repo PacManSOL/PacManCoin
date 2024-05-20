@@ -1,12 +1,26 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+const images = {
+    pacman: new Image(),
+    ghost: new Image(),
+    coin: new Image(),
+    win: new Image(),
+    gameOver: new Image()
+};
+
+images.pacman.src = 'images/pacman.png';
+images.ghost.src = 'images/ghost.png';
+images.coin.src = 'images/coin.png';
+images.win.src = 'images/win.png';
+images.gameOver.src = 'images/gameOver.png';
+
 const pacman = {
     x: 50,
     y: 50,
     size: 20,
     speed: 2,
-    dx: 2,
+    dx: 0,
     dy: 0
 };
 
@@ -35,27 +49,13 @@ const coins = [
 let score = 0;
 let lives = 3;
 
-const images = {
-    win: 'images/win.png',
-    gameOver: 'images/gameOver.png'
-};
-
 function drawPacman() {
-    ctx.beginPath();
-    ctx.arc(pacman.x, pacman.y, pacman.size, 0.2 * Math.PI, 1.8 * Math.PI);
-    ctx.lineTo(pacman.x, pacman.y);
-    ctx.fillStyle = 'yellow';
-    ctx.fill();
-    ctx.closePath();
+    ctx.drawImage(images.pacman, pacman.x - pacman.size, pacman.y - pacman.size, pacman.size * 2, pacman.size * 2);
 }
 
 function drawGhosts() {
     ghosts.forEach(ghost => {
-        ctx.beginPath();
-        ctx.arc(ghost.x, ghost.y, ghost.size, 0, 2 * Math.PI);
-        ctx.fillStyle = 'red';
-        ctx.fill();
-        ctx.closePath();
+        ctx.drawImage(images.ghost, ghost.x - ghost.size, ghost.y - ghost.size, ghost.size * 2, ghost.size * 2);
     });
 }
 
@@ -67,13 +67,9 @@ function drawWalls() {
 }
 
 function drawCoins() {
-    ctx.fillStyle = 'gold';
     coins.forEach(coin => {
         if (!coin.collected) {
-            ctx.beginPath();
-            ctx.arc(coin.x, coin.y, coin.size, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.closePath();
+            ctx.drawImage(images.coin, coin.x - coin.size, coin.y - coin.size, coin.size * 2, coin.size * 2);
         }
     });
 }
@@ -103,12 +99,12 @@ function movePacman() {
             document.getElementById('score').textContent = `SCORE: ${score}`;
 
             if (coins.every(coin => coin.collected)) {
-                const winImg = new Image();
-                winImg.src = images.win;
+                const winImg = images.win;
                 winImg.onload = () => {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(winImg, 0, 0, canvas.width, canvas.height);
                 };
+                ctx.drawImage(winImg, 0, 0, canvas.width, canvas.height);
             }
         }
     });
@@ -133,12 +129,12 @@ function moveGhosts() {
             lives--;
             document.getElementById('lives').removeChild(document.querySelector('.life'));
             if (lives === 0) {
-                const gameOverImg = new Image();
-                gameOverImg.src = images.gameOver;
+                const gameOverImg = images.gameOver;
                 gameOverImg.onload = () => {
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(gameOverImg, 0, 0, canvas.width, canvas.height);
                 };
+                ctx.drawImage(gameOverImg, 0, 0, canvas.width, canvas.height);
                 return;
             }
         }
@@ -161,26 +157,31 @@ function update() {
 document.addEventListener('keydown', e => {
     switch (e.key) {
         case 'ArrowUp':
-        case 'w':
             pacman.dx = 0;
             pacman.dy = -pacman.speed;
             break;
         case 'ArrowDown':
-        case 's':
             pacman.dx = 0;
             pacman.dy = pacman.speed;
             break;
         case 'ArrowLeft':
-        case 'a':
             pacman.dx = -pacman.speed;
             pacman.dy = 0;
             break;
         case 'ArrowRight':
-        case 'd':
             pacman.dx = pacman.speed;
             pacman.dy = 0;
             break;
     }
 });
 
-update();
+document.addEventListener('keyup', e => {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        pacman.dx = 0;
+        pacman.dy = 0;
+    }
+});
+
+images.pacman.onload = () => {
+    update();
+};
