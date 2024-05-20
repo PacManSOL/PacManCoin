@@ -18,15 +18,15 @@ images.gameOver.src = 'images/gameOver.png';
 const pacman = {
     x: 50,
     y: 50,
-    size: 20,
+    size: 15,
     speed: 2,
     dx: 0,
     dy: 0
 };
 
 const ghosts = [
-    { x: 100, y: 100, size: 20, speed: 1.5, dx: 1.5, dy: 0 },
-    { x: 200, y: 200, size: 20, speed: 1.5, dx: 1.5, dy: 0 }
+    { x: 100, y: 100, size: 15, speed: 1.5, dx: 1.5, dy: 0 },
+    { x: 200, y: 200, size: 15, speed: 1.5, dx: 1.5, dy: 0 }
 ];
 
 const maze = [
