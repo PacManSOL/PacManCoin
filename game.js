@@ -9,8 +9,14 @@ const images = {
     ghost2: 'images/ghost2.png',
     ghost3: 'images/ghost3.png',
     ghost4: 'images/ghost4.png',
-    coin: 'images/coin.png'
+    coin: 'images/coin.png',
+    heart: 'images/heart.png',
+    win: 'images/wygrana.png',
+    gameOver: 'images/game_over.png'
 };
+
+let score = 0;
+let lives = 3;
 
 const pacman = {
     x: 60,  // 1.5 razy większe (40 * 1.5)
@@ -53,19 +59,19 @@ function changeDirection(event) {
     const goingRight = pacman.dx === pacman.speed;
     const goingLeft = pacman.dx === -pacman.speed;
 
-    if (keyPressed === 37 && !goingRight) { // left
+    if ((keyPressed === 37 || keyPressed === 65) && !goingRight) { // left or A
         pacman.dx = -pacman.speed;
         pacman.dy = 0;
     }
-    if (keyPressed === 38 && !goingDown) { // up
+    if ((keyPressed === 38 || keyPressed === 87) && !goingDown) { // up or W
         pacman.dx = 0;
         pacman.dy = -pacman.speed;
     }
-    if (keyPressed === 39 && !goingLeft) { // right
+    if ((keyPressed === 39 || keyPressed === 68) && !goingLeft) { // right or D
         pacman.dx = pacman.speed;
         pacman.dy = 0;
     }
-    if (keyPressed === 40 && !goingUp) { // down
+    if ((keyPressed === 40 || keyPressed === 83) && !goingUp) { // down or S
         pacman.dx = 0;
         pacman.dy = pacman.speed;
     }
@@ -79,10 +85,12 @@ function drawWalls() {
 }
 
 function drawCoins() {
-    coins.forEach(coin => {
-        const img = new Image();
-        img.src = coin.image;
-        ctx.drawImage(img, coin.x, coin.y, coin.size, coin.size);
+    coins.forEach((coin, index) => {
+        if (!coin.collected) {
+            const img = new Image();
+            img.src = coin.image;
+            ctx.drawImage(img, coin.x, coin.y, coin.size, coin.size);
+        }
     });
 }
 
@@ -109,6 +117,29 @@ function movePacman() {
         pacman.x -= pacman.dx;
         pacman.y -= pacman.dy;
     }
+
+    coins.forEach((coin, index) => {
+        if (!coin.collected && pacman.x < coin.x + coin.size &&
+            pacman.x + pacman.size > coin.x &&
+            pacman.y < coin.y + coin.size &&
+            pacman.y + pacman.size > coin.y) {
+            coin.collected = true;
+            score++;
+            document.getElementById('score').textContent = "SCORE: " + score;
+            // Play coin collection sound
+        }
+    });
+
+    if (coins.every(coin => coin.collected)) {
+        // Show win screen
+        const winImg = new Image();
+        winImg.src = images.win;
+        winImg.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(winImg, 0, 0, canvas.width, canvas.height);
+        };
+        return;
+    }
 }
 
 function moveGhosts() {
@@ -123,6 +154,27 @@ function moveGhosts() {
         if (ghost.y < 0 || ghost.y + ghost.size > canvas.height) {
             ghost.dy *= -1;
         }
+
+        if (pacman.x < ghost.x + ghost.size &&
+            pacman.x + pacman.size > ghost.x &&
+            pacman.y < ghost.y + ghost.size &&
+            pacman.y + pacman.size > ghost.y) {
+            // Collision with ghost
+            lives--;
+            document.getElementById('lives').removeChild(document.querySelector('.life'));
+            // Play game over sound
+
+            if (lives === 0) {
+                // Show game over screen
+                const gameOverImg = new Image();
+                gameOverImg.src = images.gameOver;
+                gameOverImg.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(gameOverImg, 0, 0, canvas.width, canvas.height);
+                };
+                return;
+            }
+        }
     });
 }
 
@@ -134,7 +186,9 @@ function update() {
     drawGhosts();
     movePacman();
     moveGhosts();
-    requestAnimationFrame(update);
+    if (lives > 0 && !coins.every(coin => coin.collected)) {
+        requestAnimationFrame(update);
+    }
 }
 
 update();
