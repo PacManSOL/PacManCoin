@@ -5,6 +5,7 @@ body {
     align-items: center;
     background-color: #000;
     color: white;
+    font-family: 'Impact', sans-serif;
 }
 
 header {
@@ -25,6 +26,8 @@ header {
 
 #game-area {
     margin: 0 20px;
+    border: 5px solid white; /* Biała obramówka */
+    box-shadow: 0 0 10px white; /* Efekt poświaty */
 }
 
 .social-icon {
@@ -32,18 +35,19 @@ header {
     margin: 10px;
 }
 
+#score-lives {
+    display: flex;
+    justify-content: space-between;
+    width: 600px;
+    margin-top: 10px;
+}
+
 #score {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
     font-size: 24px;
-    color: white;
 }
 
 #lives {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
+    display: flex;
 }
 
 .life {
