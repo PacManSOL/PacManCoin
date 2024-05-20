@@ -1,56 +1,53 @@
 body {
+    margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: 'Impact', sans-serif;
     background-color: #000;
-    color: #fff;
-    margin: 0;
+    color: white;
 }
 
 header {
     display: flex;
     align-items: center;
-    justify-content: center;
     margin: 20px 0;
 }
 
 #logo {
-    width: 75px; /* 1.5 razy większe */
-    height: 75px; /* 1.5 razy większe */
-    margin-right: 30px; /* 1.5 razy większe */
-}
-
-h1 {
-    font-family: 'Impact', sans-serif;
-    font-size: 54px; /* 1.5 razy większe */
+    width: 100px;
+    margin-right: 20px;
 }
 
 #container {
     display: flex;
-    justify-content: center;
     align-items: center;
-}
-
-#sidebar-left, #sidebar-right {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 150px; /* 1.5 razy większe */
-}
-
-.social-icon {
-    width: 75px; /* 1.5 razy większe */
-    height: 75px; /* 1.5 razy większe */
 }
 
 #game-area {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #000;
+    margin: 0 20px;
 }
 
-canvas {
-    border: 3px solid #fff; /* 1.5 razy większe */
+.social-icon {
+    width: 50px;
+    margin: 10px;
+}
+
+#score {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    font-size: 24px;
+    color: white;
+}
+
+#lives {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.life {
+    width: 30px;
+    height: 30px;
+    margin-left: 5px;
 }
