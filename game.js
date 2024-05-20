@@ -1,80 +1,62 @@
 const canvas = document.getElementById('gameCanvas');
-canvas.width = 600; 
-canvas.height = 600;
 const ctx = canvas.getContext('2d');
 
-const images = {
-    pacman: 'images/cheese.png',
-    ghost1: 'images/ghost1.png',
-    ghost2: 'images/ghost2.png',
-    ghost3: 'images/ghost3.png',
-    ghost4: 'images/ghost4.png',
-    coin: 'images/coin.png',
-    heart: 'images/heart.png',
-    win: 'images/wygrana.png',
-    gameOver: 'images/game_over.png'
-};
-
-let score = 0;
-let lives = 3;
-
 const pacman = {
-    x: 60,
-    y: 60,
-    size: 30,
-    speed: 3,
-    dx: 3,
+    x: 50,
+    y: 50,
+    size: 20,
+    speed: 2,
+    dx: 2,
     dy: 0
 };
 
 const ghosts = [
-    { x: 120, y: 120, size: 30, speed: 3, dx: 3, dy: 0, image: images.ghost1 },
-    { x: 480, y: 120, size: 30, speed: 3, dx: -3, dy: 0, image: images.ghost2 },
-    { x: 120, y: 480, size: 30, speed: 3, dx: 3, dy: 0, image: images.ghost3 },
-    { x: 480, y: 480, size: 30, speed: 3, dx: -3, dy: 0, image: images.ghost4 }
+    { x: 100, y: 100, size: 20, speed: 1.5, dx: 1.5, dy: 0 },
+    { x: 200, y: 200, size: 20, speed: 1.5, dx: 1.5, dy: 0 }
 ];
 
 const walls = [
-    { x: 90, y: 90, width: 420, height: 30 },
-    { x: 90, y: 90, width: 30, height: 420 },
-    { x: 90, y: 480, width: 420, height: 30 },
-    { x: 480, y: 90, width: 30, height: 420 }
+    { x: 0, y: 0, width: 600, height: 10 },
+    { x: 0, y: 0, width: 10, height: 600 },
+    { x: 0, y: 590, width: 600, height: 10 },
+    { x: 590, y: 0, width: 10, height: 600 },
+    { x: 100, y: 100, width: 400, height: 10 },
+    { x: 100, y: 100, width: 10, height: 400 },
+    { x: 100, y: 490, width: 400, height: 10 },
+    { x: 490, y: 100, width: 10, height: 400 }
 ];
 
 const coins = [
-    { x: 150, y: 150, size: 15, image: images.coin, collected: false },
-    { x: 300, y: 150, size: 15, image: images.coin, collected: false },
-    { x: 450, y: 150, size: 15, image: images.coin, collected: false },
-    { x: 150, y: 300, size: 15, image: images.coin, collected: false },
-    { x: 300, y: 300, size: 15, image: images.coin, collected: false },
-    { x: 450, y: 300, size: 15, image: images.coin, collected: false }
+    { x: 120, y: 120, size: 5, collected: false },
+    { x: 150, y: 150, size: 5, collected: false },
+    { x: 180, y: 180, size: 5, collected: false }
 ];
 
-document.addEventListener('keydown', changeDirection);
+let score = 0;
+let lives = 3;
 
-function changeDirection(event) {
-    const keyPressed = event.keyCode;
-    const goingUp = pacman.dy === -pacman.speed;
-    const goingDown = pacman.dy === pacman.speed;
-    const goingRight = pacman.dx === pacman.speed;
-    const goingLeft = pacman.dx === -pacman.speed;
+const images = {
+    win: 'images/win.png',
+    gameOver: 'images/gameOver.png'
+};
 
-    if ((keyPressed === 37 || keyPressed === 65) && !goingRight) { // left or A
-        pacman.dx = -pacman.speed;
-        pacman.dy = 0;
-    }
-    if ((keyPressed === 38 || keyPressed === 87) && !goingDown) { // up or W
-        pacman.dx = 0;
-        pacman.dy = -pacman.speed;
-    }
-    if ((keyPressed === 39 || keyPressed === 68) && !goingLeft) { // right or D
-        pacman.dx = pacman.speed;
-        pacman.dy = 0;
-    }
-    if ((keyPressed === 40 || keyPressed === 83) && !goingUp) { // down or S
-        pacman.dx = 0;
-        pacman.dy = pacman.speed;
-    }
+function drawPacman() {
+    ctx.beginPath();
+    ctx.arc(pacman.x, pacman.y, pacman.size, 0.2 * Math.PI, 1.8 * Math.PI);
+    ctx.lineTo(pacman.x, pacman.y);
+    ctx.fillStyle = 'yellow';
+    ctx.fill();
+    ctx.closePath();
+}
+
+function drawGhosts() {
+    ghosts.forEach(ghost => {
+        ctx.beginPath();
+        ctx.arc(ghost.x, ghost.y, ghost.size, 0, 2 * Math.PI);
+        ctx.fillStyle = 'red';
+        ctx.fill();
+        ctx.closePath();
+    });
 }
 
 function drawWalls() {
@@ -85,45 +67,27 @@ function drawWalls() {
 }
 
 function drawCoins() {
+    ctx.fillStyle = 'gold';
     coins.forEach(coin => {
         if (!coin.collected) {
-            const img = new Image();
-            img.src = coin.image;
-            ctx.drawImage(img, coin.x, coin.y, coin.size, coin.size);
+            ctx.beginPath();
+            ctx.arc(coin.x, coin.y, coin.size, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.closePath();
         }
     });
 }
 
-function drawPacman() {
-    const img = new Image();
-    img.src = images.pacman;
-    ctx.drawImage(img, pacman.x, pacman.y, pacman.size, pacman.size);
-}
-
-function drawGhosts() {
-    ghosts.forEach(ghost => {
-        const img = new Image();
-        img.src = ghost.image;
-        ctx.drawImage(img, ghost.x, ghost.y, ghost.size, ghost.size);
-    });
-}
-
 function checkCollision(obj1, obj2) {
-    return obj1.x < obj2.x + obj2.size &&
+    return obj1.x < obj2.x + obj2.width &&
            obj1.x + obj1.size > obj2.x &&
-           obj1.y < obj2.y + obj2.size &&
+           obj1.y < obj2.y + obj2.height &&
            obj1.y + obj1.size > obj2.y;
 }
 
 function movePacman() {
     pacman.x += pacman.dx;
     pacman.y += pacman.dy;
-
-    if (pacman.x < 0 || pacman.x + pacman.size > canvas.width ||
-        pacman.y < 0 || pacman.y + pacman.size > canvas.height) {
-        pacman.x -= pacman.dx;
-        pacman.y -= pacman.dy;
-    }
 
     walls.forEach(wall => {
         if (checkCollision(pacman, wall)) {
@@ -132,37 +96,38 @@ function movePacman() {
         }
     });
 
-    coins.forEach((coin, index) => {
-        if (!coin.collected && checkCollision(pacman, coin)) {
+    coins.forEach(coin => {
+        if (checkCollision(pacman, coin) && !coin.collected) {
             coin.collected = true;
-            score++;
-            document.getElementById('score').textContent = "SCORE: " + score;
+            score += 10;
+            document.getElementById('score').textContent = `SCORE: ${score}`;
+
+            if (coins.every(coin => coin.collected)) {
+                const winImg = new Image();
+                winImg.src = images.win;
+                winImg.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(winImg, 0, 0, canvas.width, canvas.height);
+                };
+            }
         }
     });
-
-    if (coins.every(coin => coin.collected)) {
-        const winImg = new Image();
-        winImg.src = images.win;
-        winImg.onload = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(winImg, 0, 0, canvas.width, canvas.height);
-        };
-        return;
-    }
 }
 
 function moveGhosts() {
     ghosts.forEach(ghost => {
-        ghost.x += ghost.dx;
-        ghost.y += ghost.dy;
+        let dx = pacman.x - ghost.x;
+        let dy = pacman.y - ghost.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+        ghost.x += (dx / distance) * ghost.speed;
+        ghost.y += (dy / distance) * ghost.speed;
 
-        if (ghost.x < 0 || ghost.x + ghost.size > canvas.width) {
-            ghost.dx *= -1;
-        }
-
-        if (ghost.y < 0 || ghost.y + ghost.size > canvas.height) {
-            ghost.dy *= -1;
-        }
+        walls.forEach(wall => {
+            if (checkCollision(ghost, wall)) {
+                ghost.x -= (dx / distance) * ghost.speed;
+                ghost.y -= (dy / distance) * ghost.speed;
+            }
+        });
 
         if (checkCollision(pacman, ghost)) {
             lives--;
@@ -192,5 +157,30 @@ function update() {
         requestAnimationFrame(update);
     }
 }
+
+document.addEventListener('keydown', e => {
+    switch (e.key) {
+        case 'ArrowUp':
+        case 'w':
+            pacman.dx = 0;
+            pacman.dy = -pacman.speed;
+            break;
+        case 'ArrowDown':
+        case 's':
+            pacman.dx = 0;
+            pacman.dy = pacman.speed;
+            break;
+        case 'ArrowLeft':
+        case 'a':
+            pacman.dx = -pacman.speed;
+            pacman.dy = 0;
+            break;
+        case 'ArrowRight':
+        case 'd':
+            pacman.dx = pacman.speed;
+            pacman.dy = 0;
+            break;
+    }
+});
 
 update();
