@@ -29,25 +29,36 @@ const ghosts = [
     { x: 200, y: 200, size: 20, speed: 1.5, dx: 1.5, dy: 0 }
 ];
 
-const walls = [
-    { x: 0, y: 0, width: 600, height: 10 },
-    { x: 0, y: 0, width: 10, height: 600 },
-    { x: 0, y: 590, width: 600, height: 10 },
-    { x: 590, y: 0, width: 10, height: 600 },
-    { x: 100, y: 100, width: 400, height: 10 },
-    { x: 100, y: 100, width: 10, height: 400 },
-    { x: 100, y: 490, width: 400, height: 10 },
-    { x: 490, y: 100, width: 10, height: 400 }
-];
-
-const coins = [
-    { x: 120, y: 120, size: 5, collected: false },
-    { x: 150, y: 150, size: 5, collected: false },
-    { x: 180, y: 180, size: 5, collected: false }
+const maze = [
+    // 0: empty space, 1: wall, 2: coin
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 2, 0, 0, 1, 0, 0, 0, 1, 2, 1, 0, 0, 0, 1, 2, 0, 0, 2, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+    [1, 0, 1, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 1, 2, 0, 1],
+    [1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
+    [1, 0, 0, 0, 1, 2, 1, 0, 1, 2, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+    [1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+    [1, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 1, 0, 1, 2, 0, 0, 0, 1],
+    [1, 2, 1, 1, 1, 0, 1, 0, 1, 2, 1, 1, 1, 0, 1, 1, 1, 1, 2, 1],
+    [1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
 let score = 0;
 let lives = 3;
+
+function drawMaze() {
+    for (let row = 0; row < maze.length; row++) {
+        for (let col = 0; col < maze[row].length; col++) {
+            if (maze[row][col] === 1) {
+                ctx.fillStyle = 'blue';
+                ctx.fillRect(col * 30, row * 30, 30, 30);
+            } else if (maze[row][col] === 2) {
+                ctx.drawImage(images.coin, col * 30 + 10, row * 30 + 10, 10, 10);
+            }
+        }
+    }
+}
 
 function drawPacman() {
     ctx.drawImage(images.pacman, pacman.x - pacman.size, pacman.y - pacman.size, pacman.size * 2, pacman.size * 2);
@@ -56,21 +67,6 @@ function drawPacman() {
 function drawGhosts() {
     ghosts.forEach(ghost => {
         ctx.drawImage(images.ghost, ghost.x - ghost.size, ghost.y - ghost.size, ghost.size * 2, ghost.size * 2);
-    });
-}
-
-function drawWalls() {
-    ctx.fillStyle = 'blue';
-    walls.forEach(wall => {
-        ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
-    });
-}
-
-function drawCoins() {
-    coins.forEach(coin => {
-        if (!coin.collected) {
-            ctx.drawImage(images.coin, coin.x - coin.size, coin.y - coin.size, coin.size * 2, coin.size * 2);
-        }
     });
 }
 
@@ -85,90 +81,100 @@ function movePacman() {
     pacman.x += pacman.dx;
     pacman.y += pacman.dy;
 
-    walls.forEach(wall => {
-        if (checkCollision(pacman, wall)) {
-            pacman.x -= pacman.dx;
-            pacman.y -= pacman.dy;
-        }
-    });
-
-    coins.forEach(coin => {
-        if (checkCollision(pacman, coin) && !coin.collected) {
-            coin.collected = true;
-            score += 10;
-            document.getElementById('score').textContent = `SCORE: ${score}`;
-
-            if (coins.every(coin => coin.collected)) {
-                const winImg = images.win;
-                winImg.onload = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(winImg, 0, 0, canvas.width, canvas.height);
-                };
-                ctx.drawImage(winImg, 0, 0, canvas.width, canvas.height);
+    for (let row = 0; row < maze.length; row++) {
+        for (let col = 0; col < maze[row].length; col++) {
+            if (maze[row][col] === 1) {
+                const wall = { x: col * 30, y: row * 30, width: 30, height: 30 };
+                if (checkCollision(pacman, wall)) {
+                    pacman.x -= pacman.dx;
+                    pacman.y -= pacman.dy;
+                }
+            } else if (maze[row][col] === 2) {
+                const coin = { x: col * 30 + 10, y: row * 30 + 10, width: 10, height: 10 };
+                if (checkCollision(pacman, coin)) {
+                    maze[row][col] = 0;
+                    score += 10;
+                    document.getElementById('score').innerText = `SCORE: ${score}`;
+                }
             }
         }
-    });
+    }
 }
 
 function moveGhosts() {
     ghosts.forEach(ghost => {
-        let dx = pacman.x - ghost.x;
-        let dy = pacman.y - ghost.y;
-        let distance = Math.sqrt(dx * dx + dy * dy);
-        ghost.x += (dx / distance) * ghost.speed;
-        ghost.y += (dy / distance) * ghost.speed;
+        ghost.x += ghost.dx;
+        ghost.y += ghost.dy;
 
-        walls.forEach(wall => {
-            if (checkCollision(ghost, wall)) {
-                ghost.x -= (dx / distance) * ghost.speed;
-                ghost.y -= (dy / distance) * ghost.speed;
-            }
-        });
-
-        if (checkCollision(pacman, ghost)) {
-            lives--;
-            document.getElementById('lives').removeChild(document.querySelector('.life'));
-            if (lives === 0) {
-                const gameOverImg = images.gameOver;
-                gameOverImg.onload = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(gameOverImg, 0, 0, canvas.width, canvas.height);
-                };
-                ctx.drawImage(gameOverImg, 0, 0, canvas.width, canvas.height);
-                return;
+        for (let row = 0; row < maze.length; row++) {
+            for (let col = 0; col < maze[row].length; col++) {
+                if (maze[row][col] === 1) {
+                    const wall = { x: col * 30, y: row * 30, width: 30, height: 30 };
+                    if (checkCollision(ghost, wall)) {
+                        ghost.dx *= -1;
+                        ghost.dy *= -1;
+                    }
+                }
             }
         }
+
+        const distX = pacman.x - ghost.x;
+        const distY = pacman.y - ghost.y;
+        const angle = Math.atan2(distY, distX);
+
+        ghost.dx = Math.cos(angle) * ghost.speed;
+        ghost.dy = Math.sin(angle) * ghost.speed;
     });
 }
 
 function update() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawWalls();
-    drawCoins();
-    drawPacman();
-    drawGhosts();
+    drawMaze();
     movePacman();
     moveGhosts();
-    if (lives > 0 && !coins.every(coin => coin.collected)) {
-        requestAnimationFrame(update);
+    drawPacman();
+    drawGhosts();
+
+    ghosts.forEach(ghost => {
+        if (checkCollision(pacman, ghost)) {
+            lives -= 1;
+            document.getElementById('lives').removeChild(document.getElementById('lives').lastChild);
+            if (lives === 0) {
+                ctx.drawImage(images.gameOver, 150, 150, 300, 300);
+                return;
+            }
+            pacman.x = 50;
+            pacman.y = 50;
+        }
+    });
+
+    if (score === 160) { // adjust this value to the total number of coins
+        ctx.drawImage(images.win, 150, 150, 300, 300);
+        return;
     }
+
+    requestAnimationFrame(update);
 }
 
 document.addEventListener('keydown', e => {
     switch (e.key) {
         case 'ArrowUp':
+        case 'w':
             pacman.dx = 0;
             pacman.dy = -pacman.speed;
             break;
         case 'ArrowDown':
+        case 's':
             pacman.dx = 0;
             pacman.dy = pacman.speed;
             break;
         case 'ArrowLeft':
+        case 'a':
             pacman.dx = -pacman.speed;
             pacman.dy = 0;
             break;
         case 'ArrowRight':
+        case 'd':
             pacman.dx = pacman.speed;
             pacman.dy = 0;
             break;
@@ -176,7 +182,7 @@ document.addEventListener('keydown', e => {
 });
 
 document.addEventListener('keyup', e => {
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 's', 'a', 'd'].includes(e.key)) {
         pacman.dx = 0;
         pacman.dy = 0;
     }
